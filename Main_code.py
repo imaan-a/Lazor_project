@@ -1,3 +1,7 @@
+from read_and_export import read_bff, generate_png
+from map_and_lazer import generate_arrangement, check_intersection, generate_lazer
+
+
 class Block:
     def __init__(self, position, type):
         self.position = position
@@ -17,13 +21,13 @@ class Grid:
     def blockagestatus(self, direction_in):
         pass
 
+
 # Main code starts here
 
-
 def solve_bff(filename):
-    initial_map, available_dict, required_intersection, initial_laser = read_bff(
-        filename)
-
+    initial_map, available_dict, required_intersection, initial_laser = read_bff(filename)
+    initial_laser_path = [(initial_laser[0], initial_laser[1])]
+    current_lazer_path = initial_laser_path
     while check_intersection(current_lazer_path, required_intersection):
         current_map = generate_arrangement(initial_map, available_dict)
         current_lazer_path = generate_lazer(current_map, initial_laser)
