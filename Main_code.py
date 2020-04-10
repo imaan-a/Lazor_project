@@ -1,5 +1,5 @@
 from read_and_export import read_bff, generate_png
-from map import generate_next
+from map import generate_next_map
 from laser import check_intersection, generate_lazer
 
 
@@ -42,10 +42,11 @@ def solve_bff(filename):
         filename)
     initial_laser_path = [(initial_laser[0], initial_laser[1])]
     current_lazer_path = initial_laser_path
-    map_history = []
+    map_history = [initial_map]
 
     while check_intersection(current_lazer_path, required_intersection):
-        current_map = generate_next(initial_map, available_dict, map_history)
+        current_map = generate_next_map(
+            initial_map, available_dict, map_history)
         current_lazer_path = generate_lazer(current_map, initial_laser)
 
     generate_png(filename, current_map, current_lazer_path)
