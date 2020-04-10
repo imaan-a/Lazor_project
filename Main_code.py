@@ -1,5 +1,6 @@
 from read_and_export import read_bff, generate_png
-from map_and_lazer import generate_arrangement, check_intersection, generate_lazer
+from map import generate_next
+from laser import check_intersection, generate_lazer
 
 
 class Block:
@@ -8,7 +9,13 @@ class Block:
         self.type = type
 
     def findedges(self):
-        pass
+        return [(self.position[0] + i[0], self.position[1] + i[1]) for i in [(0, -1), (0, 1), (-1, 0), (1, 0)]]
+
+    def __eq__(self, other):
+        if self.position == other.position and self.type == other.type:
+            return True
+        else:
+            return False
 
 
 class Grid:
@@ -16,20 +23,29 @@ class Grid:
         self.position = position
 
     def findtype(self):
-        pass
+        if self.position[1] % 2 == 0:
+            return 'horizontal'
+        else:
+            return 'vertical'
 
-    def blockagestatus(self, direction_in):
-        pass
+    def __eq__(self, other):
+        if self.position == other.position:
+            return True
+        else:
+            return False
 
 
 # Main code starts here
 
 def solve_bff(filename):
-    initial_map, available_dict, required_intersection, initial_laser = read_bff(filename)
+    initial_map, available_dict, required_intersection, initial_laser = read_bff(
+        filename)
     initial_laser_path = [(initial_laser[0], initial_laser[1])]
     current_lazer_path = initial_laser_path
+    map_history = []
+
     while check_intersection(current_lazer_path, required_intersection):
-        current_map = generate_arrangement(initial_map, available_dict)
+        current_map = generate_next(initial_map, available_dict, map_history)
         current_lazer_path = generate_lazer(current_map, initial_laser)
 
     generate_png(filename, current_map, current_lazer_path)
