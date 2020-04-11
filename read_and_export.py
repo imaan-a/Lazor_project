@@ -86,9 +86,9 @@ def read_bff(filename):
         if 'C' in line:
             C = int(line[-1])
         if 'L' in line:
-            lazors.append((int(x) for x in line.split(' ')[1:]))
+            lazors.append([int(x) for x in line.split(' ')[1:]])
         if 'P' in line:
-            points.append((int(x) for x in line.split(' ')[1:]))
+            points.append([int(x) for x in line.split(' ')[1:]])
 
     usable_blocks = {'A': A, 'B': B, 'C': C}
 
@@ -103,4 +103,4 @@ def read_bff(filename):
 
 
 if __name__ == '__main__':
-    map, dict, laser, points = read_bff('mad_1.bff')
+    map1, dict1, laser, points = read_bff('mad_1.bff')
