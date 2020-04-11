@@ -1,4 +1,34 @@
 
+class Block:
+    def __init__(self, position, type):
+        self.position = position
+        self.type = type
+
+    def findedges(self):
+        return [(self.position[0] + i[0], self.position[1] + i[1]) for i in [(0, -1), (0, 1), (-1, 0), (1, 0)]]
+
+    def __eq__(self, other):
+        if self.position == other.position and self.type == other.type:
+            return True
+        else:
+            return False
+
+class Grid:
+    def __init__(self, position):
+        self.position = position
+
+    def findtype(self):
+        if self.position[1] % 2 == 0:
+            return 'horizontal'
+        else:
+            return 'vertical'
+
+    def __eq__(self, other):
+        if self.position == other.position:
+            return True
+        else:
+            return False
+
 def read_bff(filename):
     '''
     Extracts necessary data on lazor level from .bff file.
@@ -9,7 +39,7 @@ def read_bff(filename):
 
         **Returns**
             grid: **list**
-                2D list representing the initial game board.
+                2D list of class instances representing the initial game board.
             usable_blocks: **dict**
                 Dictionary of quantity of each type of blocks that can be used.
             lazors: **list**
@@ -31,13 +61,14 @@ def read_bff(filename):
         vals.append(row)
     contents = contents[ind2+1:]
     xlen = len(vals[0])
-    grid = [[0 for i in range(2*xlen)] for j in range(2*(ind2-ind1)-1)]
-    for x in range(2*xlen):
+    grid = [[0 for i in range(2*xlen+1)] for j in range(2*(ind2-ind1)-1)]
+    for x in range(2*xlen+1):
         for y in range(len(grid)):
             if (x % 2) == 0 or (y % 2) == 0:
-                grid[y][x] = 'X'
+                grid[y][x] = Grid((x, y))
             else:
-                grid[y][x] = vals[(y-1)//2][(x-1)//2]
+                block_type = vals[(y-1)//2][(x-1)//2]
+                grid[y][x] = Block((x, y), block_type)
     A = 0
     B = 0
     C = 0
@@ -58,3 +89,6 @@ def read_bff(filename):
     usable_blocks = {'A': A, 'B': B, 'C': C}
 
     return grid, usable_blocks, lazors, points
+
+if __name__ == '__main__':
+    x, y, z, p =read_bff('tiny_5.bff')
