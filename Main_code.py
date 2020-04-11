@@ -1,5 +1,5 @@
 from read_and_export import read_bff
-from map import generate_next_map
+from board import generate_next_board
 from laser import check_intersection, generate_laser
 
 
@@ -40,20 +40,20 @@ class Grid:
 # Main code starts here
 
 def solve_bff(filename):
-    initial_map, available_dict, initial_laser, required_intersection = read_bff(
+    initial_board, available_dict, initial_laser, required_intersection = read_bff(
         filename)
     initial_laser_path = [[(initial_laser[0][0], initial_laser[0][1])]]
     current_laser_path = initial_laser_path
     arrangement_history = []
 
     while not check_intersection(current_laser_path, required_intersection):
-        current_arrangement, current_map = generate_next_map(
-            initial_map, available_dict, arrangement_history)
+        current_arrangement, current_board = generate_next_board(
+            initial_board, available_dict, arrangement_history)
         arrangement_history.append(current_arrangement)
-        current_laser_path = generate_laser(current_map, initial_laser)
+        current_laser_path = generate_laser(current_board, initial_laser)
 
     return current_arrangement, current_laser_path
-    # generate_png(filename, current_map, current_laser_path)
+    # generate_png(filename, current_board, current_laser_path)
 
 
 if __name__ == '__main__':

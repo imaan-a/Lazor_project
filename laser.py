@@ -32,53 +32,54 @@ class Grid:
             return False
 
 
-def generate_laser(map, initial_laser):
+def generate_laser(board, initial_laser):
     '''
-        Generate the laser path according to map and initial laser condition.
+        Generate the laser path according to board and initial laser condition.
 
             **Parameters**
-                map: *list*
-                    2D list representing the map filled with all blocks.
+                board: *list*
+                    2D list representing the board filled with all blocks.
                 initial_laser: *list, tuple*
-                    List of tuples of coordinates and direction for each laser to start.
+                    List of tuples of coordinates and direction for each laser
+                    to start.
 
             **Returns**
                 final_laser_path: *list, list, tuple*
                     List of all laser paths.
     '''
 
-    def is_in_map(coord):
-        if 0 <= coord[0] <= len(map) and 0 <= coord[1] <= len(map[0]):
+    def is_in_board(coord):
+        if 0 <= coord[0] <= len(board) and 0 <= coord[1] <= len(board[0]):
             return True
         else:
             return False
 
     def find_next_block(coord, direction_in):
-        if map[coord[0]][coord[1]].findtype() == 'prohibited' or is_in_map(coord) is False or isinstance(map[coord[0]][coord[1]], Block):
+        if board[coord[0]][coord[1]].findtype() == 'prohibited' or is_in_board(coord) is False or isinstance(board[coord[0]][coord[1]], Block):
             raise Exception('Current coord is prohibited:' + str(coord))
-        if map[coord[0]][coord[1]].findtype() == 'vertical':
-            next_block = map[coord[0] + direction_in[0]][coord[1]]
-        if map[coord[0]][coord[1]].findtype() == 'horizontal':
-            next_block = map[coord[0]][coord[1] + direction_in[1]]
+        if board[coord[0]][coord[1]].findtype() == 'vertical':
+            next_block = board[coord[0] + direction_in[0]][coord[1]]
+        if board[coord[0]][coord[1]].findtype() == 'horizontal':
+            next_block = board[coord[0]][coord[1] + direction_in[1]]
         return next_block
 
-    def find_direction_out(map, coord, direction_in, next_block):
-        if map[coord[0]][coord[1]].findtype() == 'prohibited' or is_in_map(coord) is False or isinstance(map[coord[0]][coord[1]], Block):
+    def find_direction_out(board, coord, direction_in, next_block):
+        if board[coord[0]][coord[1]].findtype() == 'prohibited' or is_in_board(coord) is False or isinstance(board[coord[0]][coord[1]], Block):
             raise Exception('Current coord is prohibited:' + str(coord))
-        if is_in_map(next_block.position) is False or next_block.type == 'B':
+        if is_in_board(next_block.position) is False or next_block.type == 'B':
             direction_out = (0, 0)
         if next_block.type == 'o' or next_block.type == 'x':
             direction_out = direction_in
         if next_block.type == 'A':
-            if map[coord[0]][coord[1]].findtype() == 'vertical':
+            if board[coord[0]][coord[1]].findtype() == 'vertical':
                 direction_out = (-direction_in[0], direction_in[1])
-            if map[coord[0]][coord[1]].findtype() == 'horizontal':
+            if board[coord[0]][coord[1]].findtype() == 'horizontal':
                 direction_out = (direction_in[0], -direction_in[1])
         if next_block.type == 'C':
-            if map[coord[0]][coord[1]].findtype() == 'vertical':
+            if board[coord[0]][coord[1]].findtype() == 'vertical':
                 direction_out = [
                     (-direction_in[0], direction_in[1]), direction_in]
-            if map[coord[0]][coord[1]].findtype() == 'horizontal':
+            if board[coord[0]][coord[1]].findtype() == 'horizontal':
                 direction_out = [
                     (direction_in[0], -direction_in[1]), direction_in]
         return direction_out
@@ -100,7 +101,7 @@ def generate_laser(map, initial_laser):
                 direction_in = (laser[-1][0] - laser[-2][0],
                                 laser[-1][1] - laser[-2][1])
             direction_out = find_direction_out(
-                map, laser[-1], direction_in, find_next_block(laser[-1], direction_in))
+                board, laser[-1], direction_in, find_next_block(laser[-1], direction_in))
             if find_next_block(laser[-1], direction_in).type == 'C':
                 next_coord_0 = (laser[-1][0] + direction_out[0][0],
                                 laser[-1][1] + direction_out[0][1])
@@ -113,7 +114,7 @@ def generate_laser(map, initial_laser):
                               laser[-1][1] + direction_out[1])
                 laser.append(next_coord)
             # If laser has reached its end, break the loop.
-            if is_in_map(laser[-1]) is False or laser[-1] == laser[-2]:
+            if is_in_board(laser[-1]) is False or laser[-1] == laser[-2]:
                 final_laser_path[current_laser_index] = laser[:-1]
                 break
         current_laser_index += 1
