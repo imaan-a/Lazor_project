@@ -45,7 +45,7 @@ def read_bff(filename):
                 2D list of class instances representing the initial game board.
             usable_blocks: *dict*
                 Dictionary of quantity of each type of blocks that can be used.
-            lazors: *list, list, tuple*
+            lazors: *list, tuple*
                 List of coordinates and direction for each lazor.
             points: *list, tuple*
                 List of coordinates that lazors need to intersect.

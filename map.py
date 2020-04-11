@@ -32,14 +32,14 @@ class Grid:
             return False
 
 
-def generate_next_map(initial_map, available_dict, arrangement_history):
+def generate_next_map(map, available_dict, arrangement_history):
     '''
         Genrate next possible map filled with all usable blocks using random
         sampling method.
         The map should be different from all maps generated before.
 
             **Parameters**
-                initial_map: *list, list, object*
+                map: *list, list, object*
                     2D list representing the initial game board.
                 available_dict: *dict*
                     Dictionary of quantity of each type of blocks that can be
@@ -76,7 +76,7 @@ def generate_next_map(initial_map, available_dict, arrangement_history):
             for i in range(b):
                 available_blocks.append(a)
     block_num = len(available_blocks)
-    next_map = initial_map
+    next_map = map
     while True:
         slots_sample = random.sample(available_slots, block_num)
         arrangement = find_arrangement(slots_sample, available_blocks)
