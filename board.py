@@ -32,14 +32,14 @@ class Grid:
             return False
 
 
-def generate_next_map(map, available_dict, arrangement_history):
+def generate_next_board(board, available_dict, arrangement_history):
     '''
-        Genrate next possible map filled with all usable blocks using random
+        Genrate next possible board filled with all usable blocks using random
         sampling method.
-        The map should be different from all maps generated before.
+        The board should be different from all boards generated before.
 
             **Parameters**
-                map: *list, list, object*
+                board: *list, list, object*
                     2D list representing the initial game board.
                 available_dict: *dict*
                     Dictionary of quantity of each type of blocks that can be
@@ -50,8 +50,8 @@ def generate_next_map(map, available_dict, arrangement_history):
             **Returns**
                 arrangement: *dict*
                     Dictionary of positions of all blocks that need to be filled.
-                next_map: *list, list, object*
-                    2D list representing the new map filled with all usable
+                next_board: *list, list, object*
+                    2D list representing the new board filled with all usable
                     blocks.
 
     '''
@@ -61,22 +61,21 @@ def generate_next_map(map, available_dict, arrangement_history):
         arrangement = {}
         for seq, blocktype in enumerate(available_blocks):
             if blocktype in arrangement.keys():
-                arrangement[blocktype].append(slots_sample[seq])
+                arrangement[blocktype].add(slots_sample[seq])
             else:
-                arrangement[blocktype] = [slots_sample[seq]]
+                arrangement[blocktype] = set(slots_sample[seq])
         return arrangement
 
-    dim_x = len(map)
-    dim_y = len(map[0])
-    available_slots = [map[i][j].position for i in range(dim_x) for j in range(
-        dim_y) if isinstance(map[i][j], Block) and map[i][j].type == 'o']
+    dim_x = len(board)
+    dim_y = len(board[0])
+    available_slots = [board[i][j].position for i in range(dim_x) for j in range(dim_y) if isinstance(board[i][j], Block) and board[i][j].type == 'o']
     available_blocks = []
     for a, b in available_dict.items():
         if b != 0:
             for i in range(b):
                 available_blocks.append(a)
     block_num = len(available_blocks)
-    next_map = map
+    next_board = board
     while True:
         slots_sample = random.sample(available_slots, block_num)
         arrangement = find_arrangement(slots_sample, available_blocks)
@@ -84,8 +83,8 @@ def generate_next_map(map, available_dict, arrangement_history):
             continue
         else:
             for i in block_num:
-                next_map[slots_sample[i][0]][slots_sample[i]
-                                             [1]].type = available_blocks[i]
+                next_board[slots_sample[i][0]][slots_sample[i]
+                                               [1]].type = available_blocks[i]
             break
 
-    return arrangement, next_map
+    return arrangement, next_board

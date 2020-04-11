@@ -103,4 +103,5 @@ def read_bff(filename):
 
 
 if __name__ == '__main__':
-    map1, dict1, laser, points = read_bff('mad_1.bff')
+    board, dict1, laser, points = read_bff('mad_1.bff')
+
