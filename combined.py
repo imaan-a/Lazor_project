@@ -43,7 +43,7 @@ class Board_filler:
         self.arrangement_list = arrangement_list
         self.arrangement_history = []
         self.available_list = available_list
-        self.filled = 0
+        self.filled = None
 
     def next(self):
         self.arrangement_history.append(self.arrangement_list.pop())
@@ -54,20 +54,20 @@ class Board_filler:
                                            [1]].category = self.available_list[i]
 
 class Output:
-    
+
     def __init__(self, solved_board, soln_filename):
-        
+
         self.img = Image.new('RGB', (800, 800), (255,255,255))
         self.dw = ImageDraw.Draw(self.img)
         self.board = solved_board
         self.name = soln_filename
         self.xdim = len(self.board[0])
         self.ydim = len(self.board)
-        
+
         self.dw.text((20, 40), text="Black Outline - Reflect Block", fill='#000')
         self.dw.text((20, 60), text="Black Square - Opaque Block", fill='#000')
         self.dw.text((20, 80), text="Grey Square - Refract Block", fill='#000')
-        
+
         for x in range(self.xdim):
             for y in range(self.ydim):
                 coords = self.get_coords(x, y)
@@ -85,27 +85,27 @@ class Output:
 
     def add_reflect_block(self, coords):
         self.dw.rectangle(coords, outline = "#000", fill = "#fff", width=4)
-    
+
     def add_opaque_block(self, coords):
         self.dw.rectangle(coords, outline="#000", fill="#000", width=2)
-    
+
     def add_refract_block(self, coords):
         self.dw.rectangle(coords, fill="#a5a5a5", outline="#a5a5a5")
-    
+
     def add_empty_block(self, coords):
         self.dw.rectangle(coords, outline="#a5a5a5", fill='#fff', width=1)
-    
+
     def save_as_png(self):
         self.img.save(self.name + '.png', 'png')
-    
+
     def get_coords(self, x, y):
         coords = [(70 * x + 30, 70 * y + 110), (70 * x + 80, 70 * y + 160)]
         return coords
-    
+
 def display_board(board, laser=[]):
-    for i in range(len(board)):
-        for j in range(len(board[1])):
-            c = board[j][i]
+    for j in range(len(board[0])):
+        for i in range(len(board)):
+            c = board[i][j]
             if isinstance(c, Block):
                 cprint(c.category, 'green', end=' ')
             elif c.position in laser:
@@ -186,7 +186,7 @@ def read_bff(filename):
     return trans(grid), usable_blocks, lazors, intersection
 
 
-def generate_laser(board, initial_laser, threshold):
+def generate_laser(board, initial_laser, threshold=100):
     '''
         Generate the laser path according to board and initial laser condition.
 
@@ -233,6 +233,18 @@ def generate_laser(board, initial_laser, threshold):
                 direction_out = [
                     (direction_in[0], -direction_in[1]), direction_in]
         return direction_out
+    
+    def check_cyclic_laser(laser):
+        count = len(laser)
+        copy = laser.copy()
+        for i in range(count):
+            element = copy.pop()
+            index = copy.count(element)
+            if index != 0 and copy[-1] == copy[index - 1]:
+                return True
+        if not copy:
+            return False
+
 
     final_laser_path = []
     initial_directions = []
@@ -270,8 +282,12 @@ def generate_laser(board, initial_laser, threshold):
             if is_in_board(laser[-1]) is False or laser[-1] == laser[-2]:
                 final_laser_path[current_laser_index] = laser[:-1]
                 break
+            if check_cyclic_laser(laser):
+                print('Cycle detected in Laser '+str(current_laser_index))
+                final_laser_path[current_laser_index] = laser
+                break
             if len(laser) > threshold:
-                print('Reached threshold...')
+                print('Laser '+str(current_laser_index)+' reached threshold')
                 final_laser_path[current_laser_index] = laser
                 break
         current_laser_index += 1
@@ -291,7 +307,7 @@ def all_laser_points(laserlist):
     return laser_points
 
 
-def solve_bff(filename, threshold):
+def solve_bff(filename, threshold='auto'):
     initial_board, available_dict, initial_laser, required_intersection = read_bff(
         filename)
     initial_laser_path = [[(initial_laser[0][0], initial_laser[0][1])]]
@@ -319,11 +335,9 @@ def solve_bff(filename, threshold):
             break
 
     return current_board, current_laser_path
-    # generate_png(filename, current_board, current_laser_path)
 
 
 if __name__ == '__main__':
-    board_1, path_1 = solve_bff('bff/mad_4.bff', 15)
+    board_1, path_1 = solve_bff('bff/numbered_6.bff')
     display_board(board_1.filled, all_laser_points(path_1))
-    Output(board_1.filled, '_soln')
-
+    
