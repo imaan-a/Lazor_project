@@ -1,5 +1,6 @@
 import copy
-
+import itertools
+from termcolor import cprint
 
 class Block:
     def __init__(self, position, category):
@@ -52,36 +53,17 @@ class Board_filler:
                                            [1]].category = self.available_list[i]
 
 
-def display_board(board):
+def display_board(board, laser=[]):
     for i in range(len(board)):
         for j in range(len(board[1])):
-            c = board[i][j]
+            c = board[j][i]
             if isinstance(c, Block):
-                print(c.category, end=' ')
+                cprint(c.category, 'green', end=' ')
+            elif c.position in laser:
+                cprint('*', 'red', end = ' ')
             else:
-                print('*', end=' ')
+                cprint('*', end=' ')
         print(' ')
-
-
-def get_sublists(lis, m):
-    def sublists(lis=[], m=0, ans=[], allAns=[]):
-        if m == 0:
-            allAns.append(ans.copy())
-            return
-        if len(lis) < m:
-            raise Exception("Too short the list is.")
-        length = len(lis)
-        for iter in range(length - m + 1):
-            ans[-m] = lis[iter]
-            if iter + 1 < length:
-                sublists(lis[iter + 1:], m - 1, ans, allAns)
-            else:
-                allAns.append(ans.copy())
-                return
-    allAns = []
-    ans = [None for i in range(m)]
-    sublists(lis, m, ans, allAns)
-    return allAns
 
 
 def read_bff(filename):
@@ -150,8 +132,9 @@ def read_bff(filename):
             for j in range(len(i)):
                 a[j].append(i[j])
         return a
-
-    return trans(grid), usable_blocks, lazors, points
+    intersection = [tuple(i) for i in points]
+    
+    return trans(grid), usable_blocks, lazors, intersection
 
 
 def generate_laser(board, initial_laser):
@@ -208,12 +191,12 @@ def generate_laser(board, initial_laser):
         final_laser_path.append([(initial_laser[i][0], initial_laser[i][1])])
         initial_directions.append((initial_laser[i][2], initial_laser[i][3]))
     current_laser_index = 0
-    while current_laser_index < (len(final_laser_path) - 1):
+    
+    while current_laser_index < len(final_laser_path):
         laser = final_laser_path[current_laser_index]
-        initial_direction = initial_directions[current_laser_index]
         while True:
             if len(laser) == 1:
-                direction_in = initial_direction
+                direction_in = initial_directions[current_laser_index]
             else:
                 direction_in = (laser[-1][0] - laser[-2][0],
                                 laser[-1][1] - laser[-2][1])
@@ -221,8 +204,7 @@ def generate_laser(board, initial_laser):
             if is_in_board(next_block_coord) is False:
                 final_laser_path[current_laser_index] = laser
                 break
-            else:
-                next_block = board[next_block_coord[0]][next_block_coord[1]]
+            next_block = board[next_block_coord[0]][next_block_coord[1]]
             direction_out = find_direction_out(
                 laser[-1], direction_in, next_block)
             if next_block.category == 'C':
@@ -245,12 +227,14 @@ def generate_laser(board, initial_laser):
 
 
 def check_intersection(laserlist, required_intersection):
+    result = all(i in all_laser_points(laserlist) for i in required_intersection)
+    return result
+
+def all_laser_points(laserlist):
     laser_points = []
     for i in laserlist:
         laser_points += i
-    result = all(i in laser_points for i in required_intersection)
-    return result
-
+    return laser_points
 
 def solve_bff(filename):
     initial_board, available_dict, initial_laser, required_intersection = read_bff(
@@ -266,7 +250,8 @@ def solve_bff(filename):
         if b != 0:
             for i in range(b):
                 available_list.append(a)
-    arrangement_list = get_sublists(available_slots, len(available_list))
+    arrangement_list = list(
+        itertools.permutations(available_slots, len(available_list)))
     current_board = Board_filler(
         initial_board, arrangement_list, available_list)
 
@@ -275,7 +260,7 @@ def solve_bff(filename):
         current_laser_path = generate_laser(
             current_board.filled, initial_laser)
         if current_board.arrangement_list == []:
-            print("Arrangement list elements used up.")
+            print("Arrangement list elements used up, unable to find a solution.")
             break
 
     return current_board, current_laser_path
@@ -284,5 +269,4 @@ def solve_bff(filename):
 
 if __name__ == '__main__':
     board_1, path_1 = solve_bff('mad_1.bff')
-    display_board(board_1.filled)
-    print(path_1)
+    display_board(board_1.filled, all_laser_points(path_1))

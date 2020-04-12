@@ -1,13 +1,13 @@
 class Block:
-    def __init__(self, position, type):
+    def __init__(self, position, category):
         self.position = position
-        self.type = type
+        self.category = category
 
     def findedges(self):
         return [(self.position[0] + i[0], self.position[1] + i[1]) for i in [(0, -1), (0, 1), (-1, 0), (1, 0)]]
 
     def __eq__(self, other):
-        if self.position == other.position and self.type == other.type:
+        if self.position == other.position and self.category == other.category:
             return True
         else:
             return False
@@ -17,7 +17,7 @@ class Grid:
     def __init__(self, position):
         self.position = position
 
-    def findtype(self):
+    def findcategory(self):
         if self.position[0] % 2 == 0 and self.position[1] % 2 == 0:
             return 'prohibited'
         elif self.position[1] % 2 == 0:
@@ -44,7 +44,7 @@ def read_bff(filename):
             grid: *list, list, object*
                 2D list of class instances representing the initial game board.
             usable_blocks: *dict*
-                Dictionary of quantity of each type of blocks that can be used.
+                Dictionary of quantity of each category of blocks that can be used.
             lazors: *list, tuple*
                 List of coordinates and direction for each lazor.
             points: *list, tuple*
@@ -71,8 +71,8 @@ def read_bff(filename):
             if (x % 2) == 0 or (y % 2) == 0:
                 grid[y][x] = Grid((x, y))
             else:
-                block_type = vals[(y - 1) // 2][(x - 1) // 2]
-                grid[y][x] = Block((x, y), block_type)
+                block_category = vals[(y - 1) // 2][(x - 1) // 2]
+                grid[y][x] = Block((x, y), block_category)
     A = 0
     B = 0
     C = 0
@@ -104,4 +104,3 @@ def read_bff(filename):
 
 if __name__ == '__main__':
     board, dict1, laser, points = read_bff('mad_1.bff')
-

@@ -63,7 +63,8 @@ def generate_next_board(board, available_dict, arrangement_history):
             if blocktype in arrangement.keys():
                 arrangement[blocktype].add(slots_sample[seq])
             else:
-                arrangement[blocktype] = set(slots_sample[seq])
+                arrangement[blocktype] = set()
+                arrangement[blocktype].add(slots_sample[seq])
         return arrangement
 
     dim_x = len(board)
@@ -82,7 +83,7 @@ def generate_next_board(board, available_dict, arrangement_history):
         if arrangement in arrangement_history:
             continue
         else:
-            for i in block_num:
+            for i in range(block_num):
                 next_board[slots_sample[i][0]][slots_sample[i]
                                                [1]].type = available_blocks[i]
             break

@@ -40,11 +40,11 @@ class Grid:
 # Main code starts here
 
 def solve_bff(filename):
-    initial_board, available_dict, initial_laser, required_intersection = read_bff(
-        filename)
+    initial_board, available_dict, initial_laser, required_intersection = read_bff(filename)
     initial_laser_path = [[(initial_laser[0][0], initial_laser[0][1])]]
     current_laser_path = initial_laser_path
     arrangement_history = []
+
 
     while not check_intersection(current_laser_path, required_intersection):
         current_arrangement, current_board = generate_next_board(
