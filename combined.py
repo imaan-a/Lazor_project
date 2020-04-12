@@ -137,7 +137,7 @@ def read_bff(filename):
     return trans(grid), usable_blocks, lazors, intersection
 
 
-def generate_laser(board, initial_laser, threshold_1, threshold_2):
+def generate_laser(board, initial_laser, threshold):
     '''
         Generate the laser path according to board and initial laser condition.
 
@@ -194,7 +194,7 @@ def generate_laser(board, initial_laser, threshold_1, threshold_2):
 
     while current_laser_index < len(final_laser_path):
         laser = final_laser_path[current_laser_index]
-        while current_laser_index < threshold_1:
+        while True:
             if len(laser) == 1:
                 direction_in = initial_directions[current_laser_index]
             else:
@@ -221,7 +221,8 @@ def generate_laser(board, initial_laser, threshold_1, threshold_2):
             if is_in_board(laser[-1]) is False or laser[-1] == laser[-2]:
                 final_laser_path[current_laser_index] = laser[:-1]
                 break
-            elif len(laser) > threshold_2:
+            if len(laser) > threshold:
+                print('Reached threshold...')
                 final_laser_path[current_laser_index] = laser
                 break
         current_laser_index += 1
@@ -233,13 +234,15 @@ def check_intersection(laserlist, required_intersection):
     result = all(i in all_laser_points(laserlist) for i in required_intersection)
     return result
 
+
 def all_laser_points(laserlist):
     laser_points = []
     for i in laserlist:
         laser_points += i
     return laser_points
 
-def solve_bff(filename, threshold_1, threshold_2):
+
+def solve_bff(filename, threshold):
     initial_board, available_dict, initial_laser, required_intersection = read_bff(
         filename)
     initial_laser_path = [[(initial_laser[0][0], initial_laser[0][1])]]
@@ -261,7 +264,7 @@ def solve_bff(filename, threshold_1, threshold_2):
     while not check_intersection(current_laser_path, required_intersection):
         current_board.next()
         current_laser_path = generate_laser(
-            current_board.filled, initial_laser, threshold_1, threshold_2)
+            current_board.filled, initial_laser, threshold)
         if current_board.arrangement_list == []:
             print("Arrangement list elements used up.")
             break
@@ -271,5 +274,5 @@ def solve_bff(filename, threshold_1, threshold_2):
 
 
 if __name__ == '__main__':
-    board_1, path_1 = solve_bff('bff/yarn_5.bff', 1, 70)
+    board_1, path_1 = solve_bff('bff/mad_4.bff', 15)
     display_board(board_1.filled, all_laser_points(path_1))
