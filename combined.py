@@ -1,6 +1,7 @@
 import copy
 import itertools
 from termcolor import cprint
+from PIL import Image, ImageDraw
 
 class Block:
     def __init__(self, position, category):
@@ -52,7 +53,55 @@ class Board_filler:
             self.filled[arrangement[i][0]][arrangement[i]
                                            [1]].category = self.available_list[i]
 
+class Output:
+    
+    def __init__(self, solved_board, soln_filename):
+        
+        self.img = Image.new('RGB', (800, 800), (255,255,255))
+        self.dw = ImageDraw.Draw(self.img)
+        self.board = solved_board
+        self.name = soln_filename
+        self.xdim = len(self.board[0])
+        self.ydim = len(self.board)
+        
+        self.dw.text((20, 40), text="Black Outline - Reflect Block", fill='#000')
+        self.dw.text((20, 60), text="Black Square - Opaque Block", fill='#000')
+        self.dw.text((20, 80), text="Grey Square - Refract Block", fill='#000')
+        
+        for x in range(self.xdim):
+            for y in range(self.ydim):
+                coords = self.get_coords(x, y)
+                c = self.board[x][y]
+                if isinstance(c, Block):
+                    if c.category == 'o':
+                        self.add_empty_block(coords)
+                    elif c.category == 'A':
+                        self.add_reflect_block(coords)
+                    elif c.category == 'B':
+                        self.add_opaque_block(coords)
+                    elif c.category == 'C':
+                        self.add_refract_block(coords)
+        self.save_as_png()
 
+    def add_reflect_block(self, coords):
+        self.dw.rectangle(coords, outline = "#000", fill = "#fff", width=4)
+    
+    def add_opaque_block(self, coords):
+        self.dw.rectangle(coords, outline="#000", fill="#000", width=2)
+    
+    def add_refract_block(self, coords):
+        self.dw.rectangle(coords, fill="#a5a5a5", outline="#a5a5a5")
+    
+    def add_empty_block(self, coords):
+        self.dw.rectangle(coords, outline="#a5a5a5", fill='#fff', width=1)
+    
+    def save_as_png(self):
+        self.img.save(self.name + '.png', 'png')
+    
+    def get_coords(self, x, y):
+        coords = [(70 * x + 30, 70 * y + 110), (70 * x + 80, 70 * y + 160)]
+        return coords
+    
 def display_board(board, laser=[]):
     for i in range(len(board)):
         for j in range(len(board[1])):
@@ -270,3 +319,5 @@ def solve_bff(filename):
 if __name__ == '__main__':
     board_1, path_1 = solve_bff('mad_1.bff')
     display_board(board_1.filled, all_laser_points(path_1))
+    Output(board_1.filled, 'mad_1_soln')
+    
