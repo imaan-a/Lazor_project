@@ -3,6 +3,7 @@ import itertools
 from termcolor import cprint
 from PIL import Image, ImageDraw
 
+
 class Block:
     def __init__(self, position, category):
         self.position = position
@@ -38,33 +39,34 @@ class Grid:
 
 
 class Board_filler:
-    def __init__(self, initial_board, arrangement_list, available_list):
+    def __init__(self, initial_board, arrangement_list):
         self.initial_board = initial_board
         self.arrangement_list = arrangement_list
         self.arrangement_history = []
-        self.available_list = available_list
         self.filled = None
 
     def next(self):
         self.arrangement_history.append(self.arrangement_list.pop())
-        arrangement = self.arrangement_history[-1]
+        arrangement_dict = self.arrangement_history[-1]
         self.filled = copy.deepcopy(self.initial_board)
-        for i in range(len(self.available_list)):
-            self.filled[arrangement[i][0]][arrangement[i]
-                                           [1]].category = self.available_list[i]
+        for loc, cat in arrangement_dict.items():
+            for i in range(len(loc)):
+                self.filled[loc[i][0]][loc[i][1]].category = cat[i]
+
 
 class Output:
 
     def __init__(self, solved_board, soln_filename):
 
-        self.img = Image.new('RGB', (800, 800), (255,255,255))
+        self.img = Image.new('RGB', (800, 800), (255, 255, 255))
         self.dw = ImageDraw.Draw(self.img)
         self.board = solved_board
         self.name = soln_filename
         self.xdim = len(self.board[0])
         self.ydim = len(self.board)
 
-        self.dw.text((20, 40), text="Black Outline - Reflect Block", fill='#000')
+        self.dw.text(
+            (20, 40), text="Black Outline - Reflect Block", fill='#000')
         self.dw.text((20, 60), text="Black Square - Opaque Block", fill='#000')
         self.dw.text((20, 80), text="Grey Square - Refract Block", fill='#000')
 
@@ -84,7 +86,7 @@ class Output:
         self.save_as_png()
 
     def add_reflect_block(self, coords):
-        self.dw.rectangle(coords, outline = "#000", fill = "#fff", width=4)
+        self.dw.rectangle(coords, outline="#000", fill="#fff", width=4)
 
     def add_opaque_block(self, coords):
         self.dw.rectangle(coords, outline="#000", fill="#000", width=2)
@@ -102,16 +104,35 @@ class Output:
         coords = [(70 * x + 30, 70 * y + 110), (70 * x + 80, 70 * y + 160)]
         return coords
 
-def display_board(board, laser=[]):
+
+def display_board(board, laser=[], start=[], required=[]):
+    UL, UR, DL, DR = [], [], [], []
+    if len(start) != 0:
+        for i in start:
+            if i[2] == 1 and i[3] == 1:
+                DR.append((i[0],i[1]))
+            if i[2] == 1 and i[3] == -1:
+                UR.append((i[0],i[1]))
+            if i[2] == -1 and i[3] == -1:
+                UL.append((i[0],i[1]))
+            if i[2] == -1 and i[3] == 1:
+                DL.append((i[0],i[1]))
     for j in range(len(board[0])):
         for i in range(len(board)):
             c = board[i][j]
             if isinstance(c, Block):
-                cprint(c.category, 'green', end=' ')
+                cprint("%2s" % c.category, 'red', attrs=['bold'], end='')
             elif c.position in laser:
-                cprint('*', 'red', end = ' ')
+                if c.position in UL: cprint("%2s" % '×', 'green', end='')
+                elif c.position in UR: cprint("%2s" % '×', 'green', end='')
+                elif c.position in DL: cprint("%2s" % '×', 'green', end='')
+                elif c.position in DR: cprint("%2s" % '×', 'green', end='')
+                elif c.position in required: 
+                    cprint("%2s" % '×', 'cyan', end='')
+                else: 
+                    cprint("%2s" % '×', 'magenta', end='')
             else:
-                cprint('*', end=' ')
+                cprint("%2s" % '+', end='')
         print(' ')
 
 
@@ -233,7 +254,7 @@ def generate_laser(board, initial_laser, threshold=100):
                 direction_out = [
                     (direction_in[0], -direction_in[1]), direction_in]
         return direction_out
-    
+
     def check_cyclic_laser(laser):
         count = len(laser)
         copy = laser.copy()
@@ -244,7 +265,6 @@ def generate_laser(board, initial_laser, threshold=100):
                 return True
         if not copy:
             return False
-
 
     final_laser_path = []
     initial_directions = []
@@ -283,7 +303,7 @@ def generate_laser(board, initial_laser, threshold=100):
                 final_laser_path[current_laser_index] = laser[:-1]
                 break
             if check_cyclic_laser(laser):
-                print('Cycle detected in Laser '+str(current_laser_index))
+                print('A loop detected in Laser '+str(current_laser_index))
                 final_laser_path[current_laser_index] = laser
                 break
             if len(laser) > threshold:
@@ -296,7 +316,8 @@ def generate_laser(board, initial_laser, threshold=100):
 
 
 def check_intersection(laserlist, required_intersection):
-    result = all(i in all_laser_points(laserlist) for i in required_intersection)
+    result = all(i in all_laser_points(laserlist)
+                 for i in required_intersection)
     return result
 
 
@@ -307,7 +328,7 @@ def all_laser_points(laserlist):
     return laser_points
 
 
-def solve_bff(filename, threshold='auto'):
+def solve_bff(filename, threshold=100):
     initial_board, available_dict, initial_laser, required_intersection = read_bff(
         filename)
     initial_laser_path = [[(initial_laser[0][0], initial_laser[0][1])]]
@@ -316,28 +337,33 @@ def solve_bff(filename, threshold='auto'):
     dim_y = len(initial_board[0])
     available_slots = [initial_board[i][j].position for i in range(dim_x) for j in range(
         dim_y) if isinstance(initial_board[i][j], Block) and initial_board[i][j].category == 'o']
-    available_list = []
+    available_cats = []
     for a, b in available_dict.items():
         if b != 0:
             for i in range(b):
-                available_list.append(a)
-    arrangement_list = list(
-        itertools.permutations(available_slots, len(available_list)))
-    current_board = Board_filler(
-        initial_board, arrangement_list, available_list)
+                available_cats.append(a)
+    slots_combinations = list(
+        itertools.combinations(available_slots, len(available_cats)))
+    cats_permutations = list(
+        itertools.permutations(available_cats, len(available_cats)))
+    unique_permutations = {i for i in cats_permutations}
+    arrangement_list = [{loc: cat}
+                        for loc in slots_combinations for cat in unique_permutations]
+    current_board = Board_filler(initial_board, arrangement_list)
 
     while not check_intersection(current_laser_path, required_intersection):
+        if current_board.arrangement_list == []:
+            raise Exception("Arrangement list elements used up.")
         current_board.next()
         current_laser_path = generate_laser(
             current_board.filled, initial_laser, threshold)
-        if current_board.arrangement_list == []:
-            print("Arrangement list elements used up.")
-            break
+        
 
     return current_board, current_laser_path
 
 
 if __name__ == '__main__':
-    board_1, path_1 = solve_bff('bff/numbered_6.bff')
-    display_board(board_1.filled, all_laser_points(path_1))
-    
+    filename = 'bff/yarn_5.bff'
+    board_1, path_1 = solve_bff(filename)
+    m, n, initial_1, required_1 = read_bff(filename)
+    display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
