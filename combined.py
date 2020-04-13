@@ -602,8 +602,6 @@ def solve_bff(filename):
     # Generate a new filled game board and calculate laser paths. Check if the
     # lasers could intersect all required points. If not, move to next board
     # until all arrangments are used up.
->>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
->>>>>>> 8ad5fe8e57629f082f798c1a2bafae25eaca0ebf
     while not check_intersection(current_laser_path, required_intersection):
         if current_board.arrangement_list == []:
             raise Exception(
@@ -619,6 +617,4 @@ if __name__ == '__main__':
     filename = 'bff/mad_1.bff'
     board_1, path_1 = solve_bff(filename)
     m, n, initial_1, required_1 = read_bff(filename)
->>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
->>>>>>> 8ad5fe8e57629f082f798c1a2bafae25eaca0ebf
     Output(board_1.filled, all_laser_points(path_1), initial_1, required_1, filename)
