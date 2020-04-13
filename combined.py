@@ -56,25 +56,29 @@ class Board_filler:
 
 class Output:
 
-    def __init__(self, solved_board, soln_filename):
+    def __init__(self, solved_board, laser_path, laser_start, intersects, soln_filename):
 
-        self.img = Image.new('RGB', (800, 800), (255, 255, 255))
-        self.dw = ImageDraw.Draw(self.img)
         self.board = solved_board
         self.name = soln_filename
         self.xdim = len(self.board[0])
         self.ydim = len(self.board)
+        self.img = Image.new('RGB', (600, 600), (255, 255, 255))
+        self.dw = ImageDraw.Draw(self.img)
 
         self.dw.text(
             (20, 40), text="Black Outline - Reflect Block", fill='#000')
         self.dw.text((20, 60), text="Black Square - Opaque Block", fill='#000')
         self.dw.text((20, 80), text="Grey Square - Refract Block", fill='#000')
+        self.dw.ellipse([210, 45, 215, 50], fill='#f00')
+        self.dw.text((220, 40), text="Lazor Start", fill='#000')
+        self.dw.ellipse([210, 65, 215, 70], fill='#000')
+        self.dw.text((220, 60), text="Required Intersection", fill='#000')
 
-        for x in range(self.xdim):
-            for y in range(self.ydim):
-                coords = self.get_coords(x, y)
-                c = self.board[x][y]
+        for j in range(self.xdim - 1):
+            for i in range(self.ydim - 1):
+                c = self.board[i][j]
                 if isinstance(c, Block):
+                    coords = self.get_coords((i - 1) // 2, (j - 1) // 2)
                     if c.category == 'o':
                         self.add_empty_block(coords)
                     elif c.category == 'A':
@@ -83,6 +87,25 @@ class Output:
                         self.add_opaque_block(coords)
                     elif c.category == 'C':
                         self.add_refract_block(coords)
+        
+        for n in range(len(laser_path) - 1):
+            x1, y1 = laser_path[n]
+            x2, y2 = laser_path[n+1]
+            if (abs(x1 - x2) <= 1) and (abs(y1 - y2) <= 1):  
+                coord1 = self.get_laser_coords(x1, y1)
+                coord2 = self.get_laser_coords(x2, y2)
+                self.add_laser_line(coord1 + coord2)
+        
+        for s in laser_start:
+            x, y = self.get_laser_coords(s[0], s[1])
+            startcoords = [(x - 2, y - 2), (x + 2, y + 2)]
+            self.add_start_point(startcoords)
+        for r in intersects:
+            p, q = r
+            new_p, new_q = self.get_laser_coords(p, q)
+            requiredcoords = [(new_p - 2, new_q - 2), (new_p + 2, new_q + 2)]
+            self.add_required_point(requiredcoords)
+        
         self.save_as_png()
 
     def add_reflect_block(self, coords):
@@ -97,11 +120,23 @@ class Output:
     def add_empty_block(self, coords):
         self.dw.rectangle(coords, outline="#a5a5a5", fill='#fff', width=1)
 
+    def add_laser_line(self, coords):
+        self.dw.line(coords, fill='#f00', width=2)
+    
+    def add_start_point(self, coords):
+        self.dw.ellipse(coords, fill='#f00')
+                        
+    def add_required_point(self, coords):
+        self.dw.ellipse(coords, fill='#000')
+    
     def save_as_png(self):
-        self.img.save(self.name + '.png', 'png')
-
-    def get_coords(self, x, y):
-        coords = [(70 * x + 30, 70 * y + 110), (70 * x + 80, 70 * y + 160)]
+        self.img.save(self.name + '_soln.png', 'png')
+    
+    def get_laser_coords(self, x, y):
+        return [28 * x + 27, 28 * y + 107]
+    
+    def get_coords(self, i, j):
+        coords = [(56 * i + 30, 56 * j + 110), (56 * i + 80, 56 * j + 160)]
         return coords
 
 
@@ -363,7 +398,9 @@ def solve_bff(filename, threshold=100):
 
 
 if __name__ == '__main__':
-    filename = 'bff/yarn_5.bff'
+    filename = 'bff/mad_1.bff'
     board_1, path_1 = solve_bff(filename)
     m, n, initial_1, required_1 = read_bff(filename)
-    display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+    #display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+    Output(board_1.filled, all_laser_points(path_1), initial_1, required_1, filename)
+    
