@@ -1,7 +1,110 @@
 import copy
 import itertools
+import unittest
+import time
 from termcolor import cprint
 from PIL import Image, ImageDraw
+
+class TestBff(unittest.TestCase):
+    '''
+    Unit test for all available .bff files. An simple visualization of the solution will be displayed once a test is passed, together with time cost.
+    '''
+    def test_dark_1(self):
+        print('-----------------------------')
+        print('Testing dark_1.bff...')
+        filename = 'bff/dark_1.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+
+    def test_mad_1(self):
+        print('-----------------------------')
+        print('Testing mad_1.bff...')
+        filename = 'bff/mad_1.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_mad_4(self):
+        print('-----------------------------')
+        print('Testing mad_4.bff...')
+        filename = 'bff/mad_4.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_mad_7(self):
+        print('-----------------------------')
+        print('Testing mad_7.bff...')
+        filename = 'bff/mad_7.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_numbered_6(self):
+        print('-----------------------------')
+        print('Testing numbered_6.bff...')
+        filename = 'bff/numbered_6.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_showstopper_4(self):
+        print('-----------------------------')
+        print('Testing showstopper_4.bff...')
+        filename = 'bff/showstopper_4.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_tiny_5(self):
+        print('-----------------------------')
+        print('Testing tiny_5.bff...')
+        filename = 'bff/tiny_5.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+    def test_yarn_5(self):
+        print('-----------------------------')
+        print('Testing yarn_5.bff...')
+        filename = 'bff/yarn_5.bff'
+        time_start = time.time()
+        board_1, path_1 = solve_bff(filename)
+        time_end = time.time()
+        time_cost = time_end-time_start
+        print('Time cost: %.4fs' % time_cost)
+        m, n, initial_1, required_1 = read_bff(filename)
+        display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
 
 
 class Block:
@@ -218,7 +321,7 @@ def display_board(board, laser=[], start=[], required=[]):
             else:
                 cprint("%2s" % '+', end='')
         print(' ')
-    cprint('Red: Block and its category', 'red')
+    cprint('Red: Block and category', 'red')
     cprint('Green: Laser starting point', 'green')
     cprint('Cyan: Required intersection point', 'cyan')
     cprint('Magenta: Laser point', 'magenta')
@@ -335,7 +438,6 @@ def generate_laser(board, initial_laser):
     '''
         Generate the laser path according to current game board and initial
         conditions of each laser.
-        Laser path will stop to generate if it is found to form a loop.
 
             **Parameters**
                 board: **list**
@@ -419,6 +521,7 @@ def generate_laser(board, initial_laser):
             next_block = board[next_block_coord[0]][next_block_coord[1]]
             direction_out = find_direction_out(
                 laser[-1], direction_in, next_block)
+            # Generate the coordinates of next laser point.
             # Fork the current path if next block is refractive.
             if next_block.category == 'C':
                 next_coord_0 = (laser[-1][0] + direction_out[0][0],
@@ -436,7 +539,7 @@ def generate_laser(board, initial_laser):
                 break
             # When a laser passes through a coordinate which already exists in
             # its path history, current direction should not be the same as the
-            # direction when it passed through the same point. Otherwise the
+            # direction when it passed through this coordinate. Otherwise the
             # laser path will never end and need to stop immediately.
             if check_cyclic_laser(laser):
                 print('A loop detected in Laser ' + str(current_laser_index))
@@ -466,7 +569,7 @@ def check_intersection(laserlist, required_intersection):
 
 def all_laser_points(laserlist):
     '''
-        Gives laser data as list.
+        Gives laser data as one single list.
     '''
     laser_points = []
     for i in laserlist:
@@ -499,10 +602,10 @@ def solve_bff(filename, threshold=100):
     # Generate a new filled game board and calculate laser paths. Check if the
     # lasers could intersect all required points. If not, move to next board
     # until all arrangments are used up.
->>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
     while not check_intersection(current_laser_path, required_intersection):
         if current_board.arrangement_list == []:
-            raise Exception("Arrangement list elements used up.")
+            raise Exception(
+                "Arrangement list elements used up, no solution found.")
         current_board.next()
         current_laser_path = generate_laser(
             current_board.filled, initial_laser)
@@ -510,9 +613,8 @@ def solve_bff(filename, threshold=100):
 
 
 if __name__ == '__main__':
-    filename = 'bff/mad_4.bff'
+    # unittest.main()
+    filename = 'bff/mad_1.bff'
     board_1, path_1 = solve_bff(filename)
     m, n, initial_1, required_1 = read_bff(filename)
-    display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
->>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
     Output(board_1.filled, all_laser_points(path_1), initial_1, required_1, filename)
