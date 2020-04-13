@@ -1,6 +1,6 @@
 import unittest
 import time
-from Lazor_Solve import solve_bff, read_bff, display_board
+from Lazor_Solve import solve_bff, read_bff, display_board, all_laser_points
 
 class TestBff(unittest.TestCase):
     '''
@@ -102,3 +102,6 @@ class TestBff(unittest.TestCase):
         print('Time cost: %.4fs' % time_cost)
         m, n, initial_1, required_1 = read_bff(filename)
         display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -510,10 +510,6 @@ def solve_bff(filename):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    # unittest.main()
-=======
->>>>>>> c58098b361b31341d0417398fadf7ea1d4b5373e
     filename = 'bff/mad_1.bff'
     board, path = solve_bff(filename)
     m, n, initial, required = read_bff(filename)
