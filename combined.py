@@ -302,14 +302,14 @@ def generate_arrangement(initial_board, available_dict):
         Generate all possible game board arrangements using available blocks.
 
             **Parameters**
-                Initial_board: *list*
+                Initial_board: **list**
                     2D list representing the initial board filled with all
                     preset blocks.
-                available_dict: *dict*
+                available_dict: **dict**
                     Dictionary of all usable blocks and their categories.
 
             **Returns**
-                arrangement_list: *list, dict*
+                arrangement_list: **list, dict**
                     List of all possible arrangments of usable game blocks.
     '''
     dim_x = len(initial_board)
@@ -338,14 +338,14 @@ def generate_laser(board, initial_laser):
         Laser path will stop to generate if it is found to form a loop.
 
             **Parameters**
-                board: *list*
+                board: **list**
                     2D list representing the board filled with all blocks.
-                initial_laser: *list, tuple*
+                initial_laser: **list, tuple**
                     List of tuples of coordinates and direction for each laser
                     to start.
 
             **Returns**
-                final_laser_path: *list, list, tuple*
+                final_laser_path: **list, list, tuple**
                     List of all laser paths.
     '''
 
@@ -496,8 +496,8 @@ def solve_bff(filename, threshold=100):
     current_laser_path = initial_laser_path
     arrangement_list = generate_arrangement(initial_board, available_dict)
     current_board = BoardFiller(initial_board, arrangement_list)
-    # Generate a new filled game board and calculate laser paths. Check if the 
-    # lasers could intersect all required ppints. If not, move to next board
+    # Generate a new filled game board and calculate laser paths. Check if the
+    # lasers could intersect all required points. If not, move to next board
     # until all arrangments are used up.
     while not check_intersection(current_laser_path, required_intersection):
         if current_board.arrangement_list == []:
