@@ -496,9 +496,21 @@ def solve_bff(filename, threshold=100):
     current_laser_path = initial_laser_path
     arrangement_list = generate_arrangement(initial_board, available_dict)
     current_board = BoardFiller(initial_board, arrangement_list)
+<<<<<<< HEAD
     # Generate a new filled game board and calculate laser paths. Check if the
     # lasers could intersect all required points. If not, move to next board
     # until all arrangments are used up.
+=======
+<<<<<<< HEAD
+    # Generate a new filled game board and calculate laser paths. Check if the 
+    # lasers could intersect all required ppints. If not, move to next board
+    # until all arrangments are used up.
+=======
+    # Generate a new filled game board and check if the laser could intersect
+    # all required ppints. If not, move to next board until all arrangments are
+    # used up.
+>>>>>>> c3f8855dfadd368079665fc2f37398677789eaeb
+>>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
     while not check_intersection(current_laser_path, required_intersection):
         if current_board.arrangement_list == []:
             raise Exception("Arrangement list elements used up.")
@@ -512,5 +524,13 @@ if __name__ == '__main__':
     filename = 'bff/mad_4.bff'
     board_1, path_1 = solve_bff(filename)
     m, n, initial_1, required_1 = read_bff(filename)
+<<<<<<< HEAD
     display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+=======
+<<<<<<< HEAD
+    display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+=======
+    # display_board(board_1.filled, all_laser_points(path_1), initial_1, required_1)
+>>>>>>> c3f8855dfadd368079665fc2f37398677789eaeb
+>>>>>>> 59a6b0c49fa9f47b8cedc01a7f5737f339fab200
     Output(board_1.filled, all_laser_points(path_1), initial_1, required_1, filename)
