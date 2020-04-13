@@ -613,16 +613,8 @@ def solve_bff(filename):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD:combined.py
-    unittest.main()
-    # filename = 'bff/mad_1.bff'
-    # board_1, path_1 = solve_bff(filename)
-    # m, n, initial_1, required_1 = read_bff(filename)
-    # Output(board_1.filled, all_laser_points(path_1), initial_1, required_1, filename)
-=======
     # unittest.main()
     filename = 'bff/mad_1.bff'
     board, path = solve_bff(filename)
     m, n, initial, required = read_bff(filename)
     Output(board.filled, all_laser_points(path), initial, required, filename)
->>>>>>> 28db0b87efbe068cbe76e96074bde07be615b498:Lazor_Solve.py
