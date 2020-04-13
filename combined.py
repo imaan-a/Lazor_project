@@ -14,7 +14,7 @@ class Block:
 
     def findedges(self):
         ''' Returns the four corner coordinates of the block object'''
-        return [(self.position[0] + i[0], self.position[1] + i[1]) 
+        return [(self.position[0] + i[0], self.position[1] + i[1])
                 for i in [(0, -1), (0, 1), (-1, 0), (1, 0)]]
 
     def __eq__(self, other):
@@ -47,7 +47,7 @@ class Grid:
             return False
 
 
-class Board_filler:
+class BoardFiller:
     '''
     Class object with information on specific board arrangement.
     '''
@@ -69,7 +69,7 @@ class Board_filler:
 
 class Output:
     '''
-    Class used to create and save visual representation of board solution. 
+    Class used to create and save visual representation of board solution.
     '''
 
     def __init__(self, solved_board, laser_path, laser_start,
@@ -93,7 +93,7 @@ class Output:
         self.dw.ellipse([210, 65, 215, 70], fill='#000')
         self.dw.text((220, 60), text="Required Intersection", fill='#000')
 
-        # creates visual of board using different block categories 
+        # creates visual of board using different block categories
         for j in range(xdim - 1):
             for i in range(ydim - 1):
                 c = self.board[i][j]
@@ -108,7 +108,7 @@ class Output:
                     elif c.category == 'C':
                         self.add_refract_block(coords)
 
-        # displays the laser path on the image 
+        # displays the laser path on the image
         for n in range(len(laser_path) - 1):
             x1, y1 = laser_path[n]
             x2, y2 = laser_path[n+1]
@@ -152,7 +152,7 @@ class Output:
     def add_start_point(self, coords):
         '''Adds red circle at given coordinates to denote laser start point.'''
         self.dw.ellipse(coords, fill='#f00')
-       
+
     def add_required_point(self, coords):
         '''Adds black circle at given coordinates to denote intersection.'''
         self.dw.ellipse(coords, fill='#000')
@@ -164,7 +164,7 @@ class Output:
     def get_laser_coords(self, x, y):
         '''Takes board coordinates and scales to image size.'''
         return [28 * x + 27, 28 * y + 107]
-    
+
     def get_coords(self, i, j):
         '''Takes board coordinates and returns image square coordinates.'''
         coords = [(56 * i + 30, 56 * j + 110), (56 * i + 80, 56 * j + 160)]
@@ -193,7 +193,7 @@ def display_board(board, laser=[], start=[], required=[]):
                 elif c.position in UR: cprint("%2s" % '×', 'green', end='')
                 elif c.position in DL: cprint("%2s" % '×', 'green', end='')
                 elif c.position in DR: cprint("%2s" % '×', 'green', end='')
-                elif c.position in required: 
+                elif c.position in required:
                     cprint("%2s" % '×', 'cyan', end='')
                 else:
                     cprint("%2s" % '×', 'magenta', end='')
@@ -389,13 +389,13 @@ def generate_laser(board, initial_laser, threshold=100):
 def check_intersection(laserlist, required_intersection):
     '''
         Checks if all required intersections are in the laser path.
-        
+
             **Parameters**
                 laserlist: **list, tuple**
-                    List of laser coordinates in path so far. 
+                    List of laser coordinates in path so far.
                 required_intersection: **list, tuple**
                     List of coordinates laser must intersect.
-            
+
             **Returns**
                 result: **bool**
     '''
@@ -406,7 +406,7 @@ def check_intersection(laserlist, required_intersection):
 
 def all_laser_points(laserlist):
     '''
-        Gives laser data as list. 
+        Gives laser data as list.
     '''
     laser_points = []
     for i in laserlist:
@@ -417,16 +417,16 @@ def all_laser_points(laserlist):
 def solve_bff(filename, threshold=100):
     '''
     Solves the lazor game given in bff file.
-    
+
         **Parameters**
             filename: **str**
                 Name of the saved bff file depicting game.
             threshold: **int**
                 Maximum length of laser path.
-        
+
         **Returns**
             current_board: **BoardFiller**
-                Board_filler class object with solved board as attribute.
+                BoardFiller class object with solved board as attribute.
             current_laser_path: **list, tuple**
                 List of coordinates of solved laser path.
     '''
@@ -450,7 +450,7 @@ def solve_bff(filename, threshold=100):
     unique_permutations = {i for i in cats_permutations}
     arrangement_list = [{loc: cat}
                         for loc in slots_combinations for cat in unique_permutations]
-    current_board = Board_filler(initial_board, arrangement_list)
+    current_board = BoardFiller(initial_board, arrangement_list)
 
     while not check_intersection(current_laser_path, required_intersection):
         if current_board.arrangement_list == []:
