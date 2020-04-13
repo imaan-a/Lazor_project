@@ -17,5 +17,4 @@ identical.In this final release, we use an improved method of exhaustion for pot
 
 
 Authors:
-Zhezhi Chen
-Imaan Amlani
+Zhezhi Chen, Imaan Amlani
